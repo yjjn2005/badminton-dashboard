@@ -2,1121 +2,484 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>🏸 민턴매치 프로</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-primary: #060B18;
-      --bg-secondary: #0D1526;
-      --bg-card: rgba(255,255,255,0.04);
-      --bg-card-hover: rgba(255,255,255,0.07);
-      --border: rgba(255,255,255,0.08);
-      --border-gold: rgba(212,175,55,0.35);
-      --gold: #D4AF37;
-      --gold-light: #F0D060;
-      --gold-dark: #9A7D20;
-      --emerald: #10B981;
-      --emerald-dark: #059669;
-      --text-primary: #F1F5F9;
-      --text-secondary: #94A3B8;
-      --text-muted: #475569;
-      --red: #F87171;
-      --blue: #60A5FA;
+      --bg: #060B18; --bg2: #0D1526; --bg3: #121D35;
+      --card: rgba(255,255,255,0.05); --card2: rgba(255,255,255,0.09);
+      --border: rgba(255,255,255,0.09); --border2: rgba(255,255,255,0.15);
+      --gold: #D4AF37; --gold-l: #F0D060; --gold-d: #9A7D20;
+      --green: #10B981; --green-d: #059669;
+      --blue: #60A5FA; --red: #F87171; --purple: #A78BFA;
+      --t1: #F1F5F9; --t2: #94A3B8; --t3: #475569;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
     body {
-      font-family: 'Pretendard', -apple-system, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
+      font-family: 'Noto Sans KR', -apple-system, sans-serif;
+      background: var(--bg); color: var(--t1);
+      min-height: 100vh; overflow-x: hidden;
     }
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; }
-
-    /* Background texture */
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
       background:
-        radial-gradient(ellipse at 20% 0%, rgba(212,175,55,0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.05) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(6,11,24,0) 0%, rgba(6,11,24,0.8) 100%);
-      pointer-events: none;
-      z-index: 0;
+        radial-gradient(ellipse at 15% 0%, rgba(212,175,55,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 100%, rgba(16,185,129,0.06) 0%, transparent 55%);
     }
+    #root { position: relative; z-index: 1; }
 
-    /* Glass card */
-    .glass {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 16px;
-      transition: all 0.2s ease;
-    }
-    .glass:hover { background: var(--bg-card-hover); }
-    .glass-gold {
-      background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.02));
-      border: 1px solid var(--border-gold);
-      border-radius: 16px;
-    }
+    /* ── scrollbar ── */
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gold-d); border-radius: 3px; }
+    .no-scroll::-webkit-scrollbar { display: none; }
 
-    /* Gold gradient text */
-    .text-gold {
-      background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* ── header ── */
+    .hdr {
+      background: rgba(6,11,24,0.9); border-bottom: 1px solid rgba(212,175,55,0.18);
+      backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100;
     }
+    .hdr-inner { max-width: 900px; margin: 0 auto; padding: 0 16px; }
+    .hdr-top { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 4px; }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { font-size: 24px; filter: drop-shadow(0 0 8px rgba(212,175,55,0.5)); }
+    .logo-text { font-size: 17px; font-weight: 800; letter-spacing: -0.5px;
+      background: linear-gradient(90deg, var(--gold-l), var(--gold), var(--gold-d));
+      background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: shimmer 3s linear infinite; }
+    .logo-sub { font-size: 10px; color: var(--t3); letter-spacing: 0.08em; margin-top: 1px; }
+    .live-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--gold); }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+      box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
-    /* Animated shimmer */
-    @keyframes shimmer {
-      0% { background-position: -200% center; }
-      100% { background-position: 200% center; }
-    }
-    .shimmer {
-      background: linear-gradient(90deg, var(--gold-dark) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 3s linear infinite;
-    }
-
-    /* Glow button */
-    .btn-gold {
-      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-      color: #1a1000;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 16px rgba(212,175,55,0.25);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-gold:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(212,175,55,0.4);
-    }
-    .btn-gold:active { transform: translateY(0); }
-    .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .btn-emerald {
-      background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 16px rgba(16,185,129,0.25);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-emerald:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(16,185,129,0.4); }
-    .btn-emerald:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-ghost:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
-
-    .btn-icon {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 6px;
-      border-radius: 8px;
-      color: var(--text-muted);
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-    }
-    .btn-icon:hover { background: rgba(255,255,255,0.08); color: var(--red); }
-
-    /* Input styles */
-    .input {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      color: var(--text-primary);
-      font-size: 14px;
-      font-family: inherit;
-      transition: all 0.2s ease;
-      outline: none;
-      width: 100%;
-    }
-    .input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.12); background: rgba(255,255,255,0.06); }
-    .input::placeholder { color: var(--text-muted); }
-    input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
-
-    /* Score input */
-    .score-input {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 4px;
-      color: var(--text-primary);
-      font-size: 20px;
-      font-weight: 700;
-      text-align: center;
-      width: 60px;
-      outline: none;
+    /* ── nav tabs ── */
+    .nav { display: flex; gap: 0; overflow-x: auto; padding-bottom: 1px; }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 10px 14px; font-size: 12px; font-weight: 600;
+      color: var(--t3); border-bottom: 2px solid transparent;
+      background: transparent; border-left: none; border-right: none; border-top: none;
+      cursor: pointer; white-space: nowrap; font-family: inherit;
       transition: all 0.2s;
     }
-    .score-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.12); }
+    .nav-btn:hover { color: var(--t2); }
+    .nav-btn.on { color: var(--gold); border-bottom-color: var(--gold); }
 
-    /* Nav tabs */
-    .nav-tab {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 16px;
-      border-bottom: 2px solid transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-      background: transparent;
-      border-left: none;
-      border-right: none;
-      border-top: none;
-      font-family: inherit;
+    /* ── main ── */
+    .main { max-width: 900px; margin: 0 auto; padding: 20px 16px 80px; }
+
+    /* ── glass card ── */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; backdrop-filter: blur(10px);
     }
-    .nav-tab:hover { color: var(--text-primary); }
-    .nav-tab.active {
-      color: var(--gold);
-      border-bottom-color: var(--gold);
+    .card-gold {
+      background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.02));
+      border: 1px solid rgba(212,175,55,0.3); border-radius: 14px;
     }
 
-    /* Badge */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      font-size: 13px;
-      font-weight: 800;
+    /* ── buttons ── */
+    .btn { border: none; cursor: pointer; font-family: inherit; font-weight: 700; border-radius: 10px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+    .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold-d)); color: #1a1000; padding: 10px 18px; font-size: 13px; box-shadow: 0 4px 14px rgba(212,175,55,0.25); }
+    .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,175,55,0.4); }
+    .btn-green { background: linear-gradient(135deg, var(--green), var(--green-d)); color: #fff; padding: 10px 18px; font-size: 13px; box-shadow: 0 4px 14px rgba(16,185,129,0.25); }
+    .btn-green:hover { transform: translateY(-1px); }
+    .btn-ghost { background: transparent; color: var(--t2); border: 1px solid var(--border); padding: 8px 14px; font-size: 12px; }
+    .btn-ghost:hover { background: var(--card2); color: var(--t1); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+    .btn-icon { background: transparent; border: none; color: var(--t3); cursor: pointer; padding: 5px; border-radius: 7px; transition: all 0.15s; display: flex; }
+    .btn-icon:hover { background: rgba(248,113,113,0.15); color: var(--red); }
+    .btn-score {
+      width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border2);
+      background: var(--card2); color: var(--t1); font-size: 20px; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.1s; user-select: none; -webkit-user-select: none;
     }
-    .badge-gold { background: linear-gradient(135deg, #F0D060, #D4AF37); color: #1a1000; box-shadow: 0 2px 12px rgba(212,175,55,0.4); }
-    .badge-silver { background: linear-gradient(135deg, #E2E8F0, #94A3B8); color: #0f172a; }
-    .badge-bronze { background: linear-gradient(135deg, #FCA97A, #B45309); color: #fff; }
-    .badge-default { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+    .btn-score:active { transform: scale(0.9); background: var(--gold); color: #1a1000; }
 
-    /* Group pill tabs */
-    .group-pill {
-      padding: 6px 18px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-secondary);
-      font-family: inherit;
+    /* ── inputs ── */
+    .inp {
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 13px; color: var(--t1);
+      font-size: 14px; font-family: inherit; outline: none; width: 100%;
+      transition: all 0.2s;
     }
-    .group-pill:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
-    .group-pill.active { background: var(--gold); color: #1a1000; border-color: var(--gold); font-weight: 700; box-shadow: 0 4px 14px rgba(212,175,55,0.3); }
+    .inp:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.1); }
+    .inp::placeholder { color: var(--t3); }
 
-    /* Progress bar */
-    .progress-track {
-      background: rgba(255,255,255,0.06);
-      border-radius: 100px;
-      height: 8px;
-      overflow: hidden;
+    /* ── badges ── */
+    .medal { display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; font-size: 12px; font-weight: 800; width: 30px; height: 30px; }
+    .medal-1 { background: linear-gradient(135deg,#F0D060,#D4AF37); color:#1a1000; box-shadow:0 2px 10px rgba(212,175,55,0.4); }
+    .medal-2 { background: linear-gradient(135deg,#E2E8F0,#94A3B8); color:#0f172a; }
+    .medal-3 { background: linear-gradient(135deg,#FCA97A,#B45309); color:#fff; }
+    .medal-n { background: rgba(255,255,255,0.07); color: var(--t3); font-size: 11px; }
+
+    /* ── status pills ── */
+    .pill-done { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); border-radius: 100px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+    .pill-wait { background: rgba(71,85,105,0.2); color: var(--t3); border: 1px solid rgba(71,85,105,0.3); border-radius: 100px; padding: 2px 10px; font-size: 11px; }
+    .pill-active { background: rgba(212,175,55,0.15); color: var(--gold); border: 1px solid rgba(212,175,55,0.3); border-radius: 100px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+
+    /* ── group selector ── */
+    .group-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .gtab {
+      padding: 5px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border); background: transparent;
+      color: var(--t3); transition: all 0.15s; font-family: inherit; white-space: nowrap;
     }
-    .progress-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: linear-gradient(90deg, var(--emerald-dark), var(--emerald), #34D399);
-      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 12px rgba(16,185,129,0.4);
+    .gtab:hover { color: var(--t2); border-color: var(--border2); }
+    .gtab.on { background: var(--gold); color: #1a1000; border-color: var(--gold); box-shadow: 0 3px 10px rgba(212,175,55,0.3); }
+    .gtab.empty { opacity: 0.4; }
+
+    /* ── score card (match) ── */
+    .match-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; transition: all 0.15s;
+      display: flex; flex-direction: column; gap: 12px;
     }
-
-    /* Table */
-    .data-table { width: 100%; border-collapse: collapse; }
-    .data-table th {
-      padding: 12px 16px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
-      text-align: center;
+    .match-card.played { border-color: rgba(16,185,129,0.2); background: rgba(16,185,129,0.03); }
+    .match-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+    .team-name { font-size: 14px; font-weight: 700; line-height: 1.3; }
+    .team-left { text-align: right; }
+    .team-right { text-align: left; }
+    .win-label { font-size: 10px; font-weight: 800; color: var(--gold); letter-spacing: 0.05em; }
+    .score-ctrl { display: flex; align-items: center; gap: 6px; justify-content: center; }
+    .score-display {
+      width: 52px; height: 44px; background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border2); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: var(--t1);
     }
-    .data-table td {
-      padding: 14px 16px;
-      font-size: 14px;
-      color: var(--text-secondary);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      text-align: center;
+    .score-display.winner { color: var(--gold); border-color: rgba(212,175,55,0.4); background: rgba(212,175,55,0.08); }
+    .vs-divider { font-size: 11px; font-weight: 800; color: var(--t3); text-align: center; min-width: 32px; }
+
+    /* ── ranking card ── */
+    .rank-row { display: grid; grid-template-columns: 36px 1fr repeat(5,44px); align-items: center; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 4px; }
+    .rank-row:last-child { border-bottom: none; }
+    .rank-row.top { background: rgba(212,175,55,0.04); }
+    .rank-val { text-align: center; font-size: 13px; }
+    .rank-win { color: var(--blue); font-weight: 700; }
+    .rank-lose { color: var(--red); font-weight: 700; }
+    .rank-diff { font-weight: 800; font-size: 14px; }
+    .rank-diff.pos { color: var(--green); }
+    .rank-diff.neg { color: var(--red); }
+
+    /* ── stat box ── */
+    .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+    .stat-num { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin-top: 8px; }
+    .stat-label { font-size: 11px; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-sub { font-size: 12px; color: var(--t3); margin-top: 4px; }
+
+    /* ── progress ── */
+    .prog-track { background: rgba(255,255,255,0.06); border-radius: 100px; height: 8px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg,var(--green-d),var(--green),#34D399); transition: width 1s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 10px rgba(16,185,129,0.4); }
+
+    /* ── section title ── */
+    .sec { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); margin-bottom: 10px; }
+
+    /* ── grid helpers ── */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+    @media(max-width:500px) { .grid4 { grid-template-columns: repeat(2,1fr); } }
+    .flex { display: flex; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .gap-16 { gap: 16px; }
+    .gap-20 { gap: 20px; }
+    .col { flex-direction: column; }
+    .wrap { flex-wrap: wrap; }
+    .between { justify-content: space-between; }
+    .center { align-items: center; }
+
+    /* ── check ring ── */
+    .check-ring {
+      width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--t3);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: all 0.15s; background: transparent; flex-shrink: 0;
     }
-    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
-    .data-table tr:last-child td { border-bottom: none; }
+    .check-ring.on { border-color: var(--green); background: rgba(16,185,129,0.15); color: var(--green); }
+    .check-ring:not(.on):hover { border-color: var(--green); }
 
-    /* Team card in setup */
-    .team-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.15s ease;
-    }
-    .team-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+    /* ── empty group indicator ── */
+    .empty-group { opacity: 0.4; pointer-events: none; }
 
-    /* Stat card */
-    .stat-number {
-      font-size: 36px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      line-height: 1;
-    }
+    /* ── podium ── */
+    .podium { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .podium-card { border-radius: 12px; padding: 16px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .podium-1 { background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.35); order: 2; }
+    .podium-2 { background: rgba(148,163,184,0.07); border: 1px solid rgba(148,163,184,0.2); order: 1; }
+    .podium-3 { background: rgba(180,83,9,0.07); border: 1px solid rgba(180,83,9,0.2); order: 3; }
+    .podium-name { font-size: 13px; font-weight: 700; line-height: 1.3; }
+    .podium-stat { font-size: 12px; font-weight: 600; }
+    .podium-bar { border-radius: 4px; width: 36px; }
 
-    /* Match row */
-    .match-row {
-      display: grid;
-      grid-template-columns: 50px 1fr 110px 1fr;
-      align-items: center;
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      transition: background 0.15s;
-    }
-    .match-row:hover { background: rgba(255,255,255,0.02); }
-    .match-row:last-child { border-bottom: none; }
+    /* ── notice ── */
+    .notice { background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 14px 16px; font-size: 13px; color: var(--t2); line-height: 1.6; }
+    .notice b { color: var(--gold); }
 
-    /* Check button */
-    .check-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 2px solid;
-      background: transparent;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      margin: auto;
-    }
-    .check-btn.played { border-color: var(--emerald); background: rgba(16,185,129,0.15); color: var(--emerald); }
-    .check-btn.unplayed { border-color: var(--text-muted); color: transparent; }
-    .check-btn.unplayed:hover { border-color: var(--emerald); color: rgba(16,185,129,0.5); }
+    .fade { animation: fadeUp 0.35s ease; }
 
-    /* Divider */
-    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
-
-    /* Loading spinner */
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spin { animation: spin 0.8s linear infinite; display: inline-block; }
-
-    /* Fade in */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-up { animation: fadeUp 0.4s ease forwards; }
-
-    /* Notification toast */
+    /* ── toast ── */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(20,30,50,0.95);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      z-index: 1000;
-      backdrop-filter: blur(16px);
-      min-width: 280px;
-      max-width: 90vw;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(13,21,38,0.97); border-radius: 12px; padding: 12px 18px;
+      display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+      z-index: 999; backdrop-filter: blur(16px); min-width: 240px; max-width: 90vw;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.5);
+      animation: fadeUp 0.25s ease;
     }
-    .toast.error { border-color: rgba(248,113,113,0.4); }
-    .toast.success { border-color: rgba(16,185,129,0.4); }
-    .toast.info { border-color: var(--border-gold); }
+    .toast.ok { border: 1px solid rgba(16,185,129,0.4); }
+    .toast.err { border: 1px solid rgba(248,113,113,0.4); }
+    .toast.info { border: 1px solid rgba(212,175,55,0.35); }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-    .toast { animation: slideUp 0.3s ease; }
-
-    /* VS badge */
-    .vs-badge {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-      text-align: center;
-    }
-
-    /* Gold dot decoration */
-    .gold-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 8px rgba(212,175,55,0.6);
-    }
-
-    /* Header logo glow */
-    .logo-glow {
-      filter: drop-shadow(0 0 8px rgba(212,175,55,0.5));
-    }
-
-    /* Overflow scroll no scrollbar */
-    .scroll-x { overflow-x: auto; }
-    .scroll-x::-webkit-scrollbar { display: none; }
-
-    /* Ranking highlight row */
-    .rank-1 td:first-child { position: relative; }
-    .rank-1 td { background: rgba(212,175,55,0.04); }
-
-    /* Section header */
-    .section-header {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    /* Responsive */
-    @media (max-width: 640px) {
-      .stat-number { font-size: 28px; }
-      .match-row { grid-template-columns: 40px 1fr 90px 1fr; padding: 12px; }
-      .score-input { width: 48px; font-size: 16px; }
+    @media(max-width:500px){
+      .rank-row { grid-template-columns: 30px 1fr repeat(3,36px); }
+      .rank-row .hide-sm { display: none; }
     }
   </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
+const genId = () => Math.random().toString(36).substr(2,9);
 
-// ── Icons (inline SVG) ──────────────────────────────────────────────
-const Icon = ({ d, size = 20, color = 'currentColor', className = '' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d={d} />
+// ─── SVG Icons ──────────────────────────────────────────────────────
+const SVG = ({ d, s=18, c='currentColor' }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
+    <path d={d}/>
   </svg>
 );
-
-const Icons = {
-  trophy:    "M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 0h1.5a2.5 2.5 0 0 1 0 5H18M4 1h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V1zm4 14a4 4 0 0 0 8 0M12 19v4m-4 0h8",
-  users:     "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm15 18v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
-  calendar:  "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
-  chart:     "M3 3v18h18M7 16l4-4 4 4 5-5",
-  camera:    "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
-  plus:      "M12 5v14M5 12h14",
-  trash:     "M3 6h18M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2",
-  check:     "M20 6L9 17l-5-5",
-  alert:     "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01",
-  loader:    "M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83",
-  chevron:   "M9 18l6-6-6-6",
-  star:      "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
-  medal:     "M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM8.21 13.89L7 23l5-3 5 3-1.21-9.12",
-  shuttle:   "M5 12a7 7 0 0 1 14 0M12 5V3M9 5.5l-.5-2M15 5.5l.5-2M7 7L5.5 5.5M17 7l1.5-1.5M12 21v-9",
-  edit:      "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z",
+const I = {
+  trophy:   "M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 0h1.5a2.5 2.5 0 0 1 0 5H18M4 1h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V1zm4 14a4 4 0 0 0 8 0M12 19v4m-4 0h8",
+  users:    "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm12 18v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+  calendar: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
+  chart:    "M3 3v18h18M7 16l4-4 4 4 5-5",
+  check:    "M20 6L9 17l-5-5",
+  plus:     "M12 5v14M5 12h14",
+  trash:    "M3 6h18M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2",
+  minus:    "M5 12h14",
+  star:     "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+  info:     "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 16v-4M12 8h.01",
 };
 
-const Ico = ({ name, size = 18, color, className = '' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color || 'currentColor'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} style={{ flexShrink: 0 }}>
-    <path d={Icons[name]} />
-  </svg>
-);
+// ─── Ranking Calc ───────────────────────────────────────────────────
+function calcRank(group, allMatches) {
+  const gm = allMatches.filter(m => m.gid === group.id && m.played);
+  let stats = group.teams.map(t => ({ ...t, played:0, wins:0, losses:0, pf:0, pa:0, diff:0 }));
+  gm.forEach(m => {
+    const i1 = stats.findIndex(t => t.id===m.t1id);
+    const i2 = stats.findIndex(t => t.id===m.t2id);
+    if(i1<0||i2<0) return;
+    stats[i1].played++; stats[i2].played++;
+    stats[i1].pf+=m.s1; stats[i1].pa+=m.s2;
+    stats[i2].pf+=m.s2; stats[i2].pa+=m.s1;
+    if(m.s1>m.s2){stats[i1].wins++;stats[i2].losses++;}
+    else if(m.s2>m.s1){stats[i2].wins++;stats[i1].losses++;}
+  });
+  stats.forEach(t => t.diff = t.pf - t.pa);
+  return stats.sort((a,b) => {
+    if(b.diff!==a.diff) return b.diff-a.diff;
+    const h = gm.find(m=>(m.t1id===a.id&&m.t2id===b.id)||(m.t1id===b.id&&m.t2id===a.id));
+    if(h){ const as=h.t1id===a.id?h.s1:h.s2, bs=h.t1id===b.id?h.s1:h.s2; if(as!==bs) return bs-as; }
+    return b.age-a.age;
+  });
+}
 
-// ── Utilities ───────────────────────────────────────────────────────
-const genId = () => Math.random().toString(36).substr(2, 9);
+function buildMatches(gid, teams, existingMatches) {
+  const existing = existingMatches.filter(m => m.gid!==gid);
+  const newM = [];
+  for(let i=0;i<teams.length;i++)
+    for(let j=i+1;j<teams.length;j++)
+      newM.push({id:genId(),gid,t1id:teams[i].id,t2id:teams[j].id,t1n:teams[i].name,t2n:teams[j].name,s1:0,s2:0,played:false});
+  return [...existing, ...newM];
+}
 
-// ── Toast ───────────────────────────────────────────────────────────
-function Toast({ msg, type }) {
-  if (!msg) return null;
-  const colors = { error: '#F87171', success: '#10B981', info: '#D4AF37' };
-  const icons = { error: 'alert', success: 'check', info: 'star' };
-  return (
-    <div className={`toast ${type}`} style={{ color: colors[type] }}>
-      <Ico name={icons[type]} size={18} color={colors[type]} />
-      <span style={{ color: '#E2E8F0', fontSize: 14 }}>{msg}</span>
+// ─── Toast ──────────────────────────────────────────────────────────
+function Toast({msg,type,onDone}) {
+  useEffect(()=>{const t=setTimeout(onDone,2800);return()=>clearTimeout(t);},[]);
+  const col = type==='ok'?'#10B981':type==='err'?'#F87171':'#D4AF37';
+  const icon = type==='ok'?I.check:type==='err'?I.info:I.star;
+  return(
+    <div className={`toast ${type}`}>
+      <SVG d={icon} s={16} c={col}/>
+      <span style={{color:'#E2E8F0'}}>{msg}</span>
     </div>
   );
 }
 
-// ── Main App ────────────────────────────────────────────────────────
+// ─── Medal ──────────────────────────────────────────────────────────
+function Medal({n}) {
+  if(n===0) return <span className="medal medal-1">1</span>;
+  if(n===1) return <span className="medal medal-2">2</span>;
+  if(n===2) return <span className="medal medal-3">3</span>;
+  return <span className="medal medal-n">{n+1}</span>;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════════════════════════════
 function App() {
-  const [tab, setTab] = useState('dashboard');
-  const [groups, setGroups] = useState([]);
+  // Pre-create 1조~10조 (all empty)
+  const [groups, setGroups] = useState(() =>
+    Array.from({length:10},(_,i)=>({id:genId(), name:`${i+1}조`, teams:[]}))
+  );
   const [matches, setMatches] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState('dashboard');
   const [toast, setToast] = useState(null);
 
-  // Demo data
-  useEffect(() => {
-    const g1 = genId(), g2 = genId();
-    const demoGroups = [
-      { id: g1, name: 'A조', teams: [
-        { id: genId(), name: '김철수/이영희', age: 85 },
-        { id: genId(), name: '박민수/최지연', age: 70 },
-        { id: genId(), name: '정대만/송태섭', age: 60 },
-      ]},
-      { id: g2, name: 'B조', teams: [
-        { id: genId(), name: '강동원/한지민', age: 72 },
-        { id: genId(), name: '오세훈/박소연', age: 68 },
-        { id: genId(), name: '유재석/조세호', age: 90 },
-      ]},
-    ];
-    const demoMatches = [];
-    demoGroups.forEach(g => {
-      for (let i = 0; i < g.teams.length; i++) {
-        for (let j = i + 1; j < g.teams.length; j++) {
-          const played = Math.random() > 0.4;
-          const s1 = played ? Math.floor(Math.random() * 22) : 0;
-          const s2 = played ? Math.floor(Math.random() * 22) : 0;
-          demoMatches.push({
-            id: genId(), groupId: g.id,
-            team1Id: g.teams[i].id, team2Id: g.teams[j].id,
-            team1Name: g.teams[i].name, team2Name: g.teams[j].name,
-            score1: s1, score2: s2, isPlayed: played
-          });
-        }
-      }
-    });
-    setGroups(demoGroups);
-    setMatches(demoMatches);
-  }, []);
+  const activeGroups = groups.filter(g => g.teams.length > 0);
 
-  const showToast = (msg, type = 'info') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3500);
+  const showToast = (msg, type='info') => {
+    setToast({msg,type});
+    setTimeout(()=>setToast(null),3000);
   };
 
-  const genMatches = (groupId, teams) => {
-    const newM = [];
-    for (let i = 0; i < teams.length; i++)
-      for (let j = i + 1; j < teams.length; j++)
-        newM.push({ id: genId(), groupId, team1Id: teams[i].id, team2Id: teams[j].id,
-          team1Name: teams[i].name, team2Name: teams[j].name, score1: 0, score2: 0, isPlayed: false });
-    setMatches(prev => [...prev.filter(m => m.groupId !== groupId), ...newM]);
-  };
-
-  // Gemini OCR
-  const analyzeImage = async (base64, type) => {
-    const apiKey = "";
-    if (!apiKey) { showToast('API 키가 설정되지 않았습니다. 직접 입력해주세요.', 'error'); return; }
-    setLoading(true);
-    try {
-      const b64 = base64.split(',')[1];
-      const prompt = type === 'bracket'
-        ? '배드민턴 조별 리그 대진표 이미지입니다. 조 이름과 각 조에 속한 팀명, 팀 합산 나이를 추출해주세요.'
-        : '배드민턴 경기 결과 점수판 이미지입니다. 두 팀 이름과 각각의 점수를 추출해주세요.';
-      const schema = type === 'bracket'
-        ? { type:"OBJECT", properties:{ groups:{ type:"ARRAY", items:{ type:"OBJECT", properties:{ name:{type:"STRING"}, teams:{ type:"ARRAY", items:{ type:"OBJECT", properties:{ name:{type:"STRING"}, age:{type:"NUMBER"} } } } } } } } }
-        : { type:"OBJECT", properties:{ matches:{ type:"ARRAY", items:{ type:"OBJECT", properties:{ team1Name:{type:"STRING"}, team2Name:{type:"STRING"}, team1Score:{type:"NUMBER"}, team2Score:{type:"NUMBER"} } } } } };
-
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ contents:[{ role:"user", parts:[{ text:prompt },{ inlineData:{ mimeType:"image/jpeg", data:b64 } }] }], generationConfig:{ responseMimeType:"application/json", responseSchema:schema } })
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error.message);
-      const result = JSON.parse(data.candidates[0].content.parts[0].text);
-
-      if (type === 'bracket' && result.groups) {
-        const parsed = result.groups.map(g => {
-          const gid = genId();
-          const teams = (g.teams||[]).map(t => ({ id:genId(), name:t.name, age:t.age||0 }));
-          genMatches(gid, teams);
-          return { id:gid, name:g.name, teams };
-        });
-        setGroups(p => [...p, ...parsed]);
-        showToast('대진표 인식 완료!', 'success');
-      } else if (type === 'score' && result.matches) {
-        let cnt = 0;
-        setMatches(prev => {
-          const nm = [...prev];
-          result.matches.forEach(sm => {
-            const idx = nm.findIndex(m =>
-              (m.team1Name.includes(sm.team1Name)||sm.team1Name.includes(m.team1Name)) &&
-              (m.team2Name.includes(sm.team2Name)||sm.team2Name.includes(m.team2Name))
-            );
-            if (idx !== -1) { nm[idx] = { ...nm[idx], score1:sm.team1Score, score2:sm.team2Score, isPlayed:true }; cnt++; }
-          });
-          return nm;
-        });
-        showToast(`${cnt}개 경기 결과 자동 입력!`, 'success');
-      }
-    } catch(e) {
-      showToast('이미지 인식 실패. 직접 입력해주세요.', 'error');
-    } finally { setLoading(false); }
-  };
-
-  const CameraBtn = ({ type, label }) => {
-    const ref = useRef();
-    return (
-      <>
-        <input type="file" accept="image/*" capture="environment" ref={ref} style={{display:'none'}}
-          onChange={e => { const f=e.target.files[0]; if(f){const r=new FileReader();r.onloadend=()=>analyzeImage(r.result,type);r.readAsDataURL(f);} }} />
-        <button className="btn-gold" onClick={() => ref.current?.click()} disabled={loading}>
-          {loading
-            ? <Ico name="loader" size={16} className="spin" />
-            : <Ico name="camera" size={16} />}
-          {label}
-        </button>
-      </>
-    );
+  const setGroupTeams = (gid, teams) => {
+    setGroups(prev => prev.map(g => g.id===gid ? {...g,teams} : g));
+    setMatches(prev => buildMatches(gid, teams, prev));
   };
 
   const tabs = [
-    { id:'dashboard', icon:'chart',    label:'대시보드' },
-    { id:'setup',     icon:'users',    label:'조/대진표' },
-    { id:'matches',   icon:'calendar', label:'경기 점수' },
-    { id:'rankings',  icon:'trophy',   label:'최종 순위' },
+    {id:'dashboard',icon:I.chart,label:'대시보드'},
+    {id:'setup',icon:I.users,label:'팀 등록'},
+    {id:'scores',icon:I.calendar,label:'점수 입력'},
+    {id:'ranks',icon:I.trophy,label:'순위표'},
   ];
 
   return (
-    <div style={{ position:'relative', zIndex:1 }}>
-      {/* ── Header ── */}
-      <header style={{ background:'rgba(6,11,24,0.85)', borderBottom:'1px solid rgba(212,175,55,0.15)', backdropFilter:'blur(20px)', position:'sticky', top:0, zIndex:100 }}>
-        <div style={{ maxWidth:1100, margin:'0 auto', padding:'0 20px' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:14, paddingBottom:2 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <div className="logo-glow" style={{ fontSize:26 }}>🏸</div>
+    <div>
+      <header className="hdr">
+        <div className="hdr-inner">
+          <div className="hdr-top">
+            <div className="logo">
+              <span className="logo-icon">🏸</span>
               <div>
-                <div className="shimmer" style={{ fontSize:18, fontWeight:800, letterSpacing:'-0.5px' }}>민턴매치 프로</div>
-                <div style={{ fontSize:11, color:'var(--text-muted)', marginTop:1, letterSpacing:'0.06em' }}>BADMINTON TOURNAMENT SYSTEM</div>
+                <div className="logo-text">민턴매치 프로</div>
+                <div className="logo-sub">BADMINTON TOURNAMENT</div>
               </div>
             </div>
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <div className="gold-dot" />
-              <span style={{ fontSize:12, color:'var(--gold)', fontWeight:600 }}>LIVE</span>
+            <div className="live-badge">
+              <div className="live-dot"/>
+              LIVE
             </div>
           </div>
-          {/* Tabs */}
-          <div className="scroll-x" style={{ display:'flex', gap:4, marginTop:4 }}>
-            {tabs.map(t => (
-              <button key={t.id} className={`nav-tab${tab===t.id?' active':''}`} onClick={() => setTab(t.id)}>
-                <Ico name={t.icon} size={14} />
-                {t.label}
+          <div className="nav no-scroll">
+            {tabs.map(t=>(
+              <button key={t.id} className={`nav-btn${tab===t.id?' on':''}`} onClick={()=>setTab(t.id)}>
+                <SVG d={t.icon} s={13}/>{t.label}
               </button>
             ))}
           </div>
         </div>
       </header>
 
-      {/* ── Main ── */}
-      <main style={{ maxWidth:1100, margin:'0 auto', padding:'28px 20px 60px' }}>
-        <div className="fade-up" key={tab}>
-          {tab==='dashboard' && <DashboardView groups={groups} matches={matches} setTab={setTab} />}
-          {tab==='setup'     && <SetupView groups={groups} setGroups={setGroups} genMatches={genMatches} CameraBtn={CameraBtn} showToast={showToast} />}
-          {tab==='matches'   && <MatchesView groups={groups} matches={matches} setMatches={setMatches} CameraBtn={CameraBtn} />}
-          {tab==='rankings'  && <RankingsView groups={groups} matches={matches} />}
-        </div>
-      </main>
+      <div className="main fade" key={tab}>
+        {tab==='dashboard' && <Dashboard groups={groups} activeGroups={activeGroups} matches={matches} setTab={setTab}/>}
+        {tab==='setup'     && <Setup groups={groups} setGroupTeams={setGroupTeams} showToast={showToast}/>}
+        {tab==='scores'    && <Scores activeGroups={activeGroups} matches={matches} setMatches={setMatches} showToast={showToast}/>}
+        {tab==='ranks'     && <Ranks activeGroups={activeGroups} matches={matches}/>}
+      </div>
 
-      {toast && <Toast msg={toast.msg} type={toast.type} />}
+      {toast && <Toast {...toast} onDone={()=>setToast(null)}/>}
     </div>
   );
 }
 
-// ── Ranking helper ──────────────────────────────────────────────────
-function calcRank(group, allMatches) {
-  const gm = allMatches.filter(m => m.groupId===group.id && m.isPlayed);
-  let stats = group.teams.map(t => ({ ...t, played:0, wins:0, losses:0, pf:0, pa:0, diff:0 }));
-  gm.forEach(m => {
-    const i1=stats.findIndex(t=>t.id===m.team1Id), i2=stats.findIndex(t=>t.id===m.team2Id);
-    if(i1<0||i2<0) return;
-    stats[i1].played++; stats[i2].played++;
-    stats[i1].pf+=m.score1; stats[i1].pa+=m.score2;
-    stats[i2].pf+=m.score2; stats[i2].pa+=m.score1;
-    if(m.score1>m.score2){ stats[i1].wins++; stats[i2].losses++; }
-    else if(m.score2>m.score1){ stats[i2].wins++; stats[i1].losses++; }
-  });
-  stats.forEach(t=>t.diff=t.pf-t.pa);
-  return stats.sort((a,b)=>{
-    if(b.diff!==a.diff) return b.diff-a.diff;
-    const h2h=gm.find(m=>(m.team1Id===a.id&&m.team2Id===b.id)||(m.team1Id===b.id&&m.team2Id===a.id));
-    if(h2h){ const as=h2h.team1Id===a.id?h2h.score1:h2h.score2, bs=h2h.team1Id===b.id?h2h.score1:h2h.score2; if(as!==bs) return bs-as; }
-    return b.age-a.age;
-  });
-}
-
-// ════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
 // 1. DASHBOARD
-// ════════════════════════════════════════════════════════════════════
-function DashboardView({ groups, matches, setTab }) {
+// ═══════════════════════════════════════════════════════════════════
+function Dashboard({groups,activeGroups,matches,setTab}) {
   const total = matches.length;
-  const played = matches.filter(m=>m.isPlayed).length;
-  const pct = total===0?0:Math.round(played/total*100);
-  const totalTeams = groups.reduce((s,g)=>s+g.teams.length,0);
+  const done  = matches.filter(m=>m.played).length;
+  const pct   = total===0?0:Math.round(done/total*100);
+  const totalTeams = activeGroups.reduce((s,g)=>s+g.teams.length,0);
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-      {/* Top stat cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16 }}>
+    <div className="flex col gap-16">
+      {/* notice */}
+      <div className="notice">
+        <b>📋 사용 방법</b><br/>
+        <b>① 팀 등록</b>에서 각 조에 선수 팀을 추가하세요 (참가 없는 조는 자동 비활성화)<br/>
+        <b>② 점수 입력</b>에서 조장이 핸드폰으로 경기 결과를 입력하세요<br/>
+        <b>③ 순위표</b>에서 조별 1·2·3위를 실시간 확인하세요
+      </div>
+
+      {/* stats */}
+      <div className="grid4">
         {[
-          { label:'참가 조', value:groups.length, sub:'개 조', icon:'users', color:'#D4AF37' },
-          { label:'참가 팀', value:totalTeams, sub:'팀', icon:'medal', color:'#10B981' },
-          { label:'전체 경기', value:total, sub:'경기', icon:'calendar', color:'#60A5FA' },
-          { label:'진행 완료', value:played, sub:`/ ${total}경기`, icon:'check', color:'#A78BFA' },
-        ].map(c => (
-          <div key={c.label} className="glass" style={{ padding:'20px 22px' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
-              <span style={{ fontSize:12, fontWeight:600, color:'var(--text-muted)', letterSpacing:'0.05em', textTransform:'uppercase' }}>{c.label}</span>
-              <Ico name={c.icon} size={18} color={c.color} />
-            </div>
-            <div className="stat-number" style={{ color: c.color }}>{c.value}</div>
-            <div style={{ fontSize:13, color:'var(--text-muted)', marginTop:4 }}>{c.sub}</div>
+          {label:'활성 조',val:activeGroups.length,sub:`/ 10조 운영`,c:'var(--gold)'},
+          {label:'참가 팀',val:totalTeams,sub:'팀',c:'var(--green)'},
+          {label:'전체 경기',val:total,sub:'경기',c:'var(--blue)'},
+          {label:'완료',val:done,sub:`/ ${total} (${pct}%)`,c:'var(--purple)'},
+        ].map(s=>(
+          <div key={s.label} className="stat-box">
+            <div className="stat-label">{s.label}</div>
+            <div className="stat-num" style={{color:s.c}}>{s.val}</div>
+            <div className="stat-sub">{s.sub}</div>
           </div>
         ))}
       </div>
 
-      {/* Progress */}
-      <div className="glass" style={{ padding:'24px 28px' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-          <div>
-            <div style={{ fontSize:14, fontWeight:700, marginBottom:4 }}>대회 진행률</div>
-            <div style={{ fontSize:12, color:'var(--text-muted)' }}>{played}경기 완료 · {total-played}경기 남음</div>
-          </div>
-          <div style={{ fontSize:32, fontWeight:800, color:'var(--emerald)' }}>{pct}<span style={{ fontSize:16, fontWeight:600 }}>%</span></div>
-        </div>
-        <div className="progress-track">
-          <div className="progress-fill" style={{ width:`${pct}%` }} />
-        </div>
-      </div>
-
-      {/* Group leaders */}
-      <div className="glass" style={{ padding:'24px 28px' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <Ico name="trophy" size={20} color="var(--gold)" />
-            <span style={{ fontSize:16, fontWeight:700 }}>현재 조별 선두팀</span>
-          </div>
-          <button className="btn-ghost" style={{ fontSize:12, padding:'6px 14px' }} onClick={()=>setTab('rankings')}>
-            전체 순위 <Ico name="chevron" size={14} />
-          </button>
-        </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))', gap:12 }}>
-          {groups.length===0 ? (
-            <div style={{ color:'var(--text-muted)', fontSize:14, padding:'20px 0', gridColumn:'1/-1', textAlign:'center' }}>
-              조를 추가하면 선두팀이 여기 표시됩니다.
+      {/* progress */}
+      {total>0 && (
+        <div className="card" style={{padding:'20px 22px'}}>
+          <div className="flex between center" style={{marginBottom:12}}>
+            <div>
+              <div style={{fontSize:14,fontWeight:700}}>대회 진행률</div>
+              <div style={{fontSize:12,color:'var(--t3)',marginTop:3}}>{done}경기 완료 · {total-done}경기 남음</div>
             </div>
-          ) : groups.map(g => {
-            const rank = calcRank(g, matches);
-            const leader = rank[0];
-            return (
-              <div key={g.id} className="glass-gold" style={{ padding:'16px 18px' }}>
-                <div style={{ fontSize:11, fontWeight:700, color:'var(--gold)', letterSpacing:'0.1em', marginBottom:8 }}>{g.name}</div>
-                {leader ? (
-                  <>
-                    <div style={{ fontSize:15, fontWeight:700, color:'var(--text-primary)' }}>{leader.name}</div>
-                    <div style={{ display:'flex', gap:12, marginTop:8 }}>
-                      <span style={{ fontSize:12, color:'var(--text-muted)' }}>승 <b style={{ color:'#60A5FA' }}>{leader.wins}</b></span>
-                      <span style={{ fontSize:12, color:'var(--text-muted)' }}>패 <b style={{ color:'#F87171' }}>{leader.losses}</b></span>
-                      <span style={{ fontSize:12, color:'var(--text-muted)' }}>득실 <b style={{ color:'var(--emerald)' }}>{leader.diff>0?`+${leader.diff}`:leader.diff}</b></span>
-                    </div>
-                  </>
-                ) : <div style={{ fontSize:13, color:'var(--text-muted)', marginTop:4 }}>경기 데이터 없음</div>}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ════════════════════════════════════════════════════════════════════
-// 2. SETUP
-// ════════════════════════════════════════════════════════════════════
-function SetupView({ groups, setGroups, genMatches, CameraBtn, showToast }) {
-  const [selId, setSelId] = useState(null);
-  const [newGroup, setNewGroup] = useState('');
-  const [newTeam, setNewTeam] = useState('');
-  const [newAge, setNewAge] = useState('');
-
-  useEffect(() => { if(!selId && groups.length>0) setSelId(groups[0].id); }, [groups]);
-
-  const addGroup = () => {
-    if(!newGroup.trim()) return;
-    const ng = { id:genId(), name:newGroup.trim(), teams:[] };
-    setGroups(p=>[...p,ng]); setSelId(ng.id); setNewGroup('');
-  };
-
-  const delGroup = (id) => {
-    if(!window.confirm('조를 삭제하시겠습니까? 관련 경기도 모두 삭제됩니다.')) return;
-    setGroups(p=>p.filter(g=>g.id!==id));
-    if(selId===id) setSelId(null);
-  };
-
-  const addTeam = () => {
-    if(!newTeam.trim()||!selId) return;
-    setGroups(prev => prev.map(g => {
-      if(g.id!==selId) return g;
-      if(g.teams.length>=6){ showToast('최대 6팀까지만 편성 가능합니다.','error'); return g; }
-      const teams=[...g.teams,{id:genId(),name:newTeam.trim(),age:Number(newAge)||0}];
-      genMatches(g.id,teams);
-      return {...g,teams};
-    }));
-    setNewTeam(''); setNewAge('');
-  };
-
-  const delTeam = (gId, tId) => {
-    if(!window.confirm('팀을 삭제하시겠습니까?')) return;
-    setGroups(prev=>prev.map(g=>{
-      if(g.id!==gId) return g;
-      const teams=g.teams.filter(t=>t.id!==tId);
-      genMatches(g.id,teams);
-      return {...g,teams};
-    }));
-  };
-
-  const sel = groups.find(g=>g.id===selId);
-
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-      {/* Header action */}
-      <div className="glass-gold" style={{ padding:'20px 24px', display:'flex', flexWrap:'wrap', justifyContent:'space-between', alignItems:'center', gap:12 }}>
-        <div>
-          <div style={{ fontSize:16, fontWeight:700, marginBottom:4 }}>대진표 자동 인식</div>
-          <div style={{ fontSize:13, color:'var(--text-muted)' }}>사진을 찍으면 AI가 조와 팀을 자동으로 추출합니다</div>
-        </div>
-        <CameraBtn type="bracket" label="대진표 사진 인식" />
-      </div>
-
-      <div style={{ display:'grid', gridTemplateColumns:'200px 1fr', gap:16 }}>
-        {/* Group list */}
-        <div className="glass" style={{ padding:16 }}>
-          <div className="section-header">조 목록</div>
-          <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:12 }}>
-            {groups.length===0
-              ? <div style={{ fontSize:13, color:'var(--text-muted)', textAlign:'center', padding:'16px 0' }}>조 없음</div>
-              : groups.map(g=>(
-                <div key={g.id}
-                  onClick={()=>setSelId(g.id)}
-                  style={{
-                    padding:'10px 12px', borderRadius:10, cursor:'pointer',
-                    background: selId===g.id ? 'rgba(212,175,55,0.12)' : 'rgba(255,255,255,0.03)',
-                    border: `1px solid ${selId===g.id?'rgba(212,175,55,0.4)':'rgba(255,255,255,0.06)'}`,
-                    display:'flex', justifyContent:'space-between', alignItems:'center',
-                    transition:'all 0.15s'
-                  }}>
-                  <span style={{ fontSize:14, fontWeight:600, color: selId===g.id?'var(--gold)':'var(--text-secondary)' }}>
-                    {g.name} <span style={{ fontSize:12, color:'var(--text-muted)' }}>({g.teams.length})</span>
-                  </span>
-                  <button className="btn-icon" onClick={e=>{e.stopPropagation();delGroup(g.id);}}>
-                    <Ico name="trash" size={14} />
-                  </button>
-                </div>
-              ))}
+            <div style={{fontSize:30,fontWeight:800,color:'var(--green)'}}>{pct}<span style={{fontSize:14,fontWeight:500}}>%</span></div>
           </div>
-          <div style={{ display:'flex', gap:6 }}>
-            <input className="input" style={{ fontSize:13, padding:'8px 10px' }} placeholder="새 조 이름"
-              value={newGroup} onChange={e=>setNewGroup(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addGroup()} />
-            <button className="btn-gold" style={{ padding:'8px 12px', flexShrink:0 }} onClick={addGroup}>
-              <Ico name="plus" size={16} />
-            </button>
-          </div>
-        </div>
-
-        {/* Team detail */}
-        <div className="glass" style={{ padding:24 }}>
-          {!sel ? (
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', color:'var(--text-muted)', fontSize:14, padding:'40px 0' }}>
-              ← 좌측에서 조를 선택하거나 새로 만드세요
-            </div>
-          ) : (
-            <>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
-                <div>
-                  <div style={{ fontSize:18, fontWeight:800 }}>{sel.name}</div>
-                  <div style={{ fontSize:13, color:'var(--text-muted)', marginTop:2 }}>참가 팀 관리 · 최대 6팀</div>
-                </div>
-                <div style={{ fontSize:28, fontWeight:800, color:'var(--gold)' }}>{sel.teams.length}<span style={{ fontSize:14, color:'var(--text-muted)', fontWeight:400 }}>/6</span></div>
-              </div>
-
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(180px,1fr))', gap:10, marginBottom:24 }}>
-                {sel.teams.map(t=>(
-                  <div key={t.id} className="team-card">
-                    <div>
-                      <div style={{ fontSize:14, fontWeight:700 }}>{t.name}</div>
-                      <div style={{ fontSize:12, color:'var(--text-muted)', marginTop:2 }}>합산 나이 {t.age}</div>
-                    </div>
-                    <button className="btn-icon" onClick={()=>delTeam(sel.id,t.id)}>
-                      <Ico name="trash" size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <hr className="divider" style={{ marginBottom:20 }} />
-              <div className="section-header">팀 수동 추가</div>
-              <div style={{ display:'flex', flexWrap:'wrap', gap:10 }}>
-                <input className="input" style={{ flex:'2 1 200px' }} placeholder="팀명 (예: 김철수/이영희)"
-                  value={newTeam} onChange={e=>setNewTeam(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addTeam()} />
-                <input className="input" type="number" style={{ flex:'1 1 120px' }} placeholder="합산 나이"
-                  value={newAge} onChange={e=>setNewAge(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addTeam()} />
-                <button className="btn-emerald" style={{ flexShrink:0 }} onClick={addTeam}>
-                  <Ico name="plus" size={16} /> 팀 추가
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ════════════════════════════════════════════════════════════════════
-// 3. MATCHES
-// ════════════════════════════════════════════════════════════════════
-function MatchesView({ groups, matches, setMatches, CameraBtn }) {
-  const [selId, setSelId] = useState(groups[0]?.id||null);
-  useEffect(()=>{ if(!selId&&groups.length>0) setSelId(groups[0].id); },[groups]);
-
-  const groupMatches = matches.filter(m=>m.groupId===selId);
-
-  const updateScore = (id, field, val) =>
-    setMatches(p=>p.map(m=>m.id===id?{...m,[field]:val===''?0:parseInt(val)||0,isPlayed:true}:m));
-
-  const toggle = (id) =>
-    setMatches(p=>p.map(m=>m.id===id?{...m,isPlayed:!m.isPlayed}:m));
-
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-      {/* Header */}
-      <div className="glass-gold" style={{ padding:'20px 24px', display:'flex', flexWrap:'wrap', justifyContent:'space-between', alignItems:'center', gap:12 }}>
-        <div>
-          <div style={{ fontSize:16, fontWeight:700, marginBottom:4 }}>경기 결과 입력</div>
-          <div style={{ fontSize:13, color:'var(--text-muted)' }}>점수판을 촬영하면 AI가 자동으로 점수를 입력합니다</div>
-        </div>
-        <CameraBtn type="score" label="점수표 사진 인식" />
-      </div>
-
-      {/* Group tabs */}
-      <div className="scroll-x" style={{ display:'flex', gap:8 }}>
-        {groups.map(g=>(
-          <button key={g.id} className={`group-pill${selId===g.id?' active':''}`} onClick={()=>setSelId(g.id)}>
-            {g.name}
-          </button>
-        ))}
-      </div>
-
-      {/* Matches */}
-      <div className="glass" style={{ overflow:'hidden' }}>
-        {groups.length===0 ? (
-          <div style={{ padding:40, textAlign:'center', color:'var(--text-muted)' }}>등록된 조가 없습니다.</div>
-        ) : groupMatches.length===0 ? (
-          <div style={{ padding:40, textAlign:'center', color:'var(--text-muted)' }}>생성된 경기가 없습니다.</div>
-        ) : (
-          <>
-            {/* Header row */}
-            <div style={{ display:'grid', gridTemplateColumns:'50px 1fr 110px 1fr', padding:'10px 16px', borderBottom:'1px solid var(--border)' }}>
-              <div style={{ fontSize:11, fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.08em', textAlign:'center' }}>상태</div>
-              <div style={{ fontSize:11, fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.08em', textAlign:'right' }}>팀 A</div>
-              <div style={{ fontSize:11, fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.08em', textAlign:'center' }}>스코어</div>
-              <div style={{ fontSize:11, fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.08em', textAlign:'left' }}>팀 B</div>
-            </div>
-
-            {groupMatches.map(m => {
-              const w1 = m.isPlayed && m.score1>m.score2;
-              const w2 = m.isPlayed && m.score2>m.score1;
-              return (
-                <div key={m.id} className="match-row">
-                  {/* Status */}
-                  <button className={`check-btn ${m.isPlayed?'played':'unplayed'}`} onClick={()=>toggle(m.id)}>
-                    {m.isPlayed && <Ico name="check" size={14} color="var(--emerald)" />}
-                  </button>
-                  {/* Team 1 */}
-                  <div style={{ textAlign:'right', paddingRight:10 }}>
-                    <span style={{ fontSize:14, fontWeight: w1?700:500, color: w1?'var(--text-primary)':'var(--text-secondary)' }}>
-                      {m.team1Name}
-                    </span>
-                    {w1 && <span style={{ marginLeft:6, fontSize:11, color:'var(--gold)', fontWeight:700 }}>WIN</span>}
-                  </div>
-                  {/* Score */}
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
-                    <input className="score-input" type="number" min="0" value={m.score1}
-                      onChange={e=>updateScore(m.id,'score1',e.target.value)}
-                      style={{ color: w1?'var(--gold)':w2?'var(--text-muted)':'var(--text-primary)' }} />
-                    <span className="vs-badge">VS</span>
-                    <input className="score-input" type="number" min="0" value={m.score2}
-                      onChange={e=>updateScore(m.id,'score2',e.target.value)}
-                      style={{ color: w2?'var(--gold)':w1?'var(--text-muted)':'var(--text-primary)' }} />
-                  </div>
-                  {/* Team 2 */}
-                  <div style={{ textAlign:'left', paddingLeft:10 }}>
-                    {w2 && <span style={{ marginRight:6, fontSize:11, color:'var(--gold)', fontWeight:700 }}>WIN</span>}
-                    <span style={{ fontSize:14, fontWeight: w2?700:500, color: w2?'var(--text-primary)':'var(--text-secondary)' }}>
-                      {m.team2Name}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ════════════════════════════════════════════════════════════════════
-// 4. RANKINGS
-// ════════════════════════════════════════════════════════════════════
-function RankingsView({ groups, matches }) {
-  const [selId, setSelId] = useState(groups[0]?.id||null);
-  useEffect(()=>{ if(!selId&&groups.length>0) setSelId(groups[0].id); },[groups]);
-
-  const group = groups.find(g=>g.id===selId);
-  const rank = group ? calcRank(group, matches) : [];
-
-  const medalBadge = (i) => {
-    if(i===0) return <span className="badge badge-gold">1</span>;
-    if(i===1) return <span className="badge badge-silver">2</span>;
-    if(i===2) return <span className="badge badge-bronze">3</span>;
-    return <span className="badge badge-default" style={{ width:28,height:28,fontSize:12 }}>{i+1}</span>;
-  };
-
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-      {/* Header */}
-      <div style={{
-        background:'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.04))',
-        border:'1px solid rgba(212,175,55,0.25)',
-        borderRadius:16, padding:'24px 28px'
-      }}>
-        <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:8 }}>
-          <Ico name="trophy" size={24} color="var(--gold)" />
-          <div className="shimmer" style={{ fontSize:22, fontWeight:800 }}>최종 조별 순위</div>
-        </div>
-        <div style={{ fontSize:13, color:'var(--text-muted)' }}>
-          순위 산정 기준: <span style={{ color:'var(--gold)' }}>득실차</span> → <span style={{ color:'#60A5FA' }}>승자승</span> → <span style={{ color:'#A78BFA' }}>연장자(합산나이)</span>
-        </div>
-      </div>
-
-      {/* Group tabs */}
-      <div className="scroll-x" style={{ display:'flex', gap:8 }}>
-        {groups.map(g=>(
-          <button key={g.id} className={`group-pill${selId===g.id?' active':''}`} onClick={()=>setSelId(g.id)}>
-            {g.name}
-          </button>
-        ))}
-      </div>
-
-      {/* Top 3 podium (if enough teams) */}
-      {rank.length>=3 && (
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
-          {[rank[1], rank[0], rank[2]].map((t, pos) => {
-            const actualPos = pos===0?2:pos===1?1:3;
-            const height = ['60px','80px','50px'][pos];
-            const colors = {
-              1: { bg:'rgba(212,175,55,0.12)', border:'rgba(212,175,55,0.35)', label:'var(--gold)' },
-              2: { bg:'rgba(148,163,184,0.08)', border:'rgba(148,163,184,0.2)', label:'#94A3B8' },
-              3: { bg:'rgba(180,83,9,0.08)', border:'rgba(180,83,9,0.2)', label:'#F97316' },
-            };
-            const c = colors[actualPos];
-            if(!t) return <div key={pos} />;
-            return (
-              <div key={t.id} style={{ background:c.bg, border:`1px solid ${c.border}`, borderRadius:16, padding:'20px 16px', textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center', gap:8 }}>
-                {medalBadge(actualPos-1)}
-                <div style={{ fontSize:14, fontWeight:700, color:'var(--text-primary)', marginTop:4 }}>{t.name}</div>
-                <div style={{ fontSize:13, color:c.label, fontWeight:600 }}>
-                  {t.diff>0?`+${t.diff}`:t.diff} 득실
-                </div>
-                <div style={{ fontSize:12, color:'var(--text-muted)' }}>{t.wins}승 {t.losses}패</div>
-                <div style={{ height, background:c.border.replace('0.35','0.2').replace('0.2','0.2'), borderRadius:4, width:40, marginTop:8, alignSelf:'center' }} />
-              </div>
-            );
-          })}
+          <div className="prog-track"><div className="prog-fill" style={{width:`${pct}%`}}/></div>
         </div>
       )}
 
-      {/* Full table */}
-      <div className="glass" style={{ overflow:'hidden' }}>
-        {!group ? (
-          <div style={{ padding:40, textAlign:'center', color:'var(--text-muted)' }}>등록된 조가 없습니다.</div>
+      {/* group leaders */}
+      <div className="card" style={{padding:'20px 20px'}}>
+        <div className="flex between center" style={{marginBottom:14}}>
+          <div className="flex gap-8 center">
+            <SVG d={I.trophy} s={18} c="var(--gold)"/>
+            <span style={{fontWeight:700,fontSize:15}}>현재 조별 선두팀</span>
+          </div>
+          <button className="btn btn-ghost btn-sm" onClick={()=>setTab('ranks')}>
+            전체 순위 →
+          </button>
+        </div>
+        {activeGroups.length===0 ? (
+          <div style={{textAlign:'center',color:'var(--t3)',padding:'20px 0',fontSize:14}}>
+            팀 등록 탭에서 팀을 추가하면 여기에 표시됩니다
+          </div>
         ) : (
-          <div style={{ overflowX:'auto' }}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th style={{ width:60 }}>순위</th>
-                  <th style={{ textAlign:'left', paddingLeft:20 }}>팀명</th>
-                  <th>경기수</th>
-                  <th style={{ color:'#60A5FA' }}>승</th>
-                  <th style={{ color:'#F87171' }}>패</th>
-                  <th>득점</th>
-                  <th>실점</th>
-                  <th style={{ color:'var(--emerald)' }}>득실차</th>
-                  <th>연령</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rank.map((t,i)=>(
-                  <tr key={t.id} style={{ background: i===0?'rgba(212,175,55,0.04)':'' }}>
-                    <td>{medalBadge(i)}</td>
-                    <td style={{ textAlign:'left', paddingLeft:20, fontWeight:700, color:'var(--text-primary)', fontSize:14 }}>{t.name}</td>
-                    <td>{t.played}</td>
-                    <td style={{ color:'#60A5FA', fontWeight:700 }}>{t.wins}</td>
-                    <td style={{ color:'#F87171', fontWeight:700 }}>{t.losses}</td>
-                    <td style={{ color:'var(--text-primary)' }}>{t.pf}</td>
-                    <td>{t.pa}</td>
-                    <td style={{ fontWeight:800, fontSize:15, color: t.diff>0?'var(--emerald)':t.diff<0?'#F87171':'var(--text-muted)' }}>
-                      {t.diff>0?`+${t.diff}`:t.diff}
-                    </td>
-                    <td style={{ fontSize:12, color:'var(--text-muted)' }}>{t.age}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(190px,1fr))',gap:10}}>
+            {activeGroups.map(g=>{
+              const rank = calcRank(g,matches);
+              const leader = rank[0];
+              return (
+                <div key={g.id} className="card-gold" style={{padding:'14px 16px'}}>
+                  <div style={{fontSize:10,fontWeight:700,color:'var(--gold)',letterSpacing:'0.1em',marginBottom:6}}>{g.name}</div>
+                  {leader ? (
+                    <>
+                      <div style={{fontSize:14,fontWeight:700,color:'var(--t1)'}}>{leader.name}</div>
+                      <div className="flex gap-12" style={{marginTop:6}}>
+                        <span style={{fontSize:12,color:'var(--t3)'}}>승 <b style={{color:'var(--blue)'}}>{leader.wins}</b></span>
+                        <span style={{fontSize:12,color:'var(--t3)'}}>패 <b style={{color:'var(--red)'}}>{leader.losses}</b></span>
+                        <span style={{fontSize:12,color:'var(--t3)'}}>득실 <b style={{color:leader.diff>=0?'var(--green)':'var(--red)'}}>{leader.diff>0?'+':''}{leader.diff}</b></span>
+                      </div>
+                    </>
+                  ) : <div style={{fontSize:12,color:'var(--t3)',marginTop:4}}>경기 결과 없음</div>}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -1124,8 +487,389 @@ function RankingsView({ groups, matches }) {
   );
 }
 
-// ── Mount ──────────────────────────────────────────────────────────
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+// ═══════════════════════════════════════════════════════════════════
+// 2. TEAM SETUP
+// ═══════════════════════════════════════════════════════════════════
+function Setup({groups,setGroupTeams,showToast}) {
+  const [selGid, setSelGid] = useState(groups[0].id);
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const sel = groups.find(g=>g.id===selGid);
+
+  const addTeam = () => {
+    if(!name.trim()) return;
+    if(sel.teams.length>=6){showToast('최대 6팀까지 편성 가능합니다','err');return;}
+    const teams=[...sel.teams,{id:genId(),name:name.trim(),age:Number(age)||0}];
+    setGroupTeams(selGid,teams);
+    setName(''); setAge('');
+    showToast(`${sel.name}에 팀 추가 완료`,'ok');
+  };
+
+  const delTeam = (tid) => {
+    const teams = sel.teams.filter(t=>t.id!==tid);
+    setGroupTeams(selGid,teams);
+  };
+
+  return (
+    <div className="flex col gap-16">
+      {/* notice */}
+      <div className="notice">
+        <b>1조~10조</b>가 미리 설정되어 있습니다. 참가 선수가 없는 조는 자동으로 <b>비활성화</b>됩니다.
+        각 조에 팀명을 입력하면 자동으로 대진이 생성됩니다.
+      </div>
+
+      {/* group selector */}
+      <div>
+        <div className="sec">조 선택</div>
+        <div className="group-tabs">
+          {groups.map(g=>(
+            <button key={g.id}
+              className={`gtab${selGid===g.id?' on':''}${g.teams.length===0?' empty':''}`}
+              onClick={()=>setSelGid(g.id)}>
+              {g.name} {g.teams.length>0?`(${g.teams.length})`:''}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* team management */}
+      {sel && (
+        <div className="card" style={{padding:20}}>
+          <div className="flex between center" style={{marginBottom:16}}>
+            <div>
+              <div style={{fontSize:18,fontWeight:800}}>{sel.name}</div>
+              <div style={{fontSize:12,color:'var(--t3)',marginTop:2}}>
+                {sel.teams.length===0?'팀 없음 (비활성)':
+                 sel.teams.length===1?'팀 1개 — 팀이 2개 이상이어야 경기가 생성됩니다':
+                 `${sel.teams.length}팀 · ${sel.teams.length*(sel.teams.length-1)/2}경기 예정`}
+              </div>
+            </div>
+            <div style={{fontSize:26,fontWeight:800,color:'var(--gold)'}}>
+              {sel.teams.length}<span style={{fontSize:12,color:'var(--t3)',fontWeight:400}}>/6</span>
+            </div>
+          </div>
+
+          {/* existing teams */}
+          {sel.teams.length>0 && (
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(170px,1fr))',gap:8,marginBottom:18}}>
+              {sel.teams.map(t=>(
+                <div key={t.id} style={{background:'var(--card2)',border:'1px solid var(--border)',borderRadius:10,padding:'12px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:700}}>{t.name}</div>
+                    {t.age>0 && <div style={{fontSize:11,color:'var(--t3)',marginTop:2}}>합산나이 {t.age}</div>}
+                  </div>
+                  <button className="btn-icon" onClick={()=>delTeam(t.id)}><SVG d={I.trash} s={14}/></button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* add team */}
+          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid var(--border)',borderRadius:10,padding:14}}>
+            <div className="sec" style={{marginBottom:8}}>팀 추가</div>
+            <div className="flex col gap-8">
+              <input className="inp" placeholder="팀명 (예: 홍길동/이순신)"
+                value={name} onChange={e=>setName(e.target.value)}
+                onKeyDown={e=>e.key==='Enter'&&addTeam()}/>
+              <div className="flex gap-8">
+                <input className="inp" type="number" placeholder="합산나이 (동점 시 연장자 우선)"
+                  value={age} onChange={e=>setAge(e.target.value)}
+                  onKeyDown={e=>e.key==='Enter'&&addTeam()}
+                  style={{flex:1}}/>
+                <button className="btn btn-green" onClick={addTeam}>
+                  <SVG d={I.plus} s={16}/>추가
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* summary */}
+      <div className="card" style={{padding:18}}>
+        <div className="sec" style={{marginBottom:10}}>전체 조 현황</div>
+        <div style={{display:'flex',flexDirection:'column',gap:6}}>
+          {groups.map(g=>(
+            <div key={g.id} className="flex between center"
+              style={{padding:'8px 0',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+              <span style={{fontSize:13,fontWeight:600,color:g.teams.length>0?'var(--t1)':'var(--t3)'}}>{g.name}</span>
+              {g.teams.length===0
+                ? <span className="pill-wait">비활성</span>
+                : g.teams.length===1
+                  ? <span className="pill-wait">{g.teams.length}팀 (최소 2팀 필요)</span>
+                  : <span className="pill-active">{g.teams.length}팀 · {g.teams.length*(g.teams.length-1)/2}경기</span>
+              }
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 3. SCORE INPUT — 조장용 모바일 UI
+// ═══════════════════════════════════════════════════════════════════
+function Scores({activeGroups,matches,setMatches,showToast}) {
+  const [selGid, setSelGid] = useState(activeGroups[0]?.id||null);
+  useEffect(()=>{if(!selGid&&activeGroups.length>0) setSelGid(activeGroups[0].id);},[activeGroups]);
+
+  const gMatches = matches.filter(m=>m.gid===selGid);
+  const done = gMatches.filter(m=>m.played).length;
+
+  const adj = (mid, field, delta) => {
+    setMatches(prev=>prev.map(m=>{
+      if(m.id!==mid) return m;
+      const val = Math.max(0,(m[field]||0)+delta);
+      return {...m,[field]:val,played:true};
+    }));
+  };
+
+  const togglePlayed = (mid) => {
+    setMatches(prev=>prev.map(m=>m.id===mid?{...m,played:!m.played}:m));
+  };
+
+  if(activeGroups.length===0) return (
+    <div className="card" style={{padding:32,textAlign:'center',color:'var(--t3)'}}>
+      팀 등록 탭에서 먼저 팀을 추가해주세요
+    </div>
+  );
+
+  return (
+    <div className="flex col gap-14">
+      {/* group select */}
+      <div>
+        <div className="sec">조 선택</div>
+        <div className="group-tabs">
+          {activeGroups.map(g=>{
+            const gm = matches.filter(m=>m.gid===g.id);
+            const gd = gm.filter(m=>m.played).length;
+            return(
+              <button key={g.id}
+                className={`gtab${selGid===g.id?' on':''}`}
+                onClick={()=>setSelGid(g.id)}>
+                {g.name} {gd>0?`${gd}/${gm.length}`:''}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* progress for this group */}
+      {gMatches.length>0 && (
+        <div className="flex between center">
+          <span style={{fontSize:12,color:'var(--t3)'}}>{done}/{gMatches.length} 경기 완료</span>
+          {done===gMatches.length && (
+            <span className="pill-done">✅ 조 완료</span>
+          )}
+        </div>
+      )}
+
+      {/* match cards */}
+      {gMatches.length===0
+        ? <div className="card" style={{padding:32,textAlign:'center',color:'var(--t3)'}}>
+            이 조에 생성된 경기가 없습니다
+          </div>
+        : gMatches.map(m=>{
+          const w1 = m.played && m.s1>m.s2;
+          const w2 = m.played && m.s2>m.s1;
+          return (
+            <div key={m.id} className={`match-card${m.played?' played':''}`}>
+              {/* header */}
+              <div className="flex between center">
+                <div style={{fontSize:11,color:'var(--t3)',fontWeight:600,letterSpacing:'0.05em'}}>
+                  {m.played ? (m.s1===m.s2?'무승부':'경기 완료') : '대기'}
+                </div>
+                <button className={`check-ring${m.played?' on':''}`} onClick={()=>togglePlayed(m.id)}>
+                  {m.played && <SVG d={I.check} s={14} c="var(--green)"/>}
+                </button>
+              </div>
+
+              {/* teams + score controls */}
+              <div className="match-teams">
+                {/* team 1 */}
+                <div className="team-left">
+                  {w1 && <div className="win-label">🏆 WIN</div>}
+                  <div className="team-name" style={{color:w1?'var(--t1)':w2?'var(--t3)':'var(--t2)'}}>{m.t1n}</div>
+                </div>
+
+                {/* score */}
+                <div className="flex col" style={{alignItems:'center',gap:6}}>
+                  <div className="flex gap-8 center">
+                    <div className="score-ctrl">
+                      <button className="btn-score" onPointerDown={()=>adj(m.id,'s1',-1)}>−</button>
+                      <div className={`score-display${w1?' winner':''}`}>{m.s1}</div>
+                      <button className="btn-score" onPointerDown={()=>adj(m.id,'s1',1)}>+</button>
+                    </div>
+                    <div className="vs-divider">VS</div>
+                    <div className="score-ctrl">
+                      <button className="btn-score" onPointerDown={()=>adj(m.id,'s2',-1)}>−</button>
+                      <div className={`score-display${w2?' winner':''}`}>{m.s2}</div>
+                      <button className="btn-score" onPointerDown={()=>adj(m.id,'s2',1)}>+</button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* team 2 */}
+                <div className="team-right">
+                  {w2 && <div className="win-label" style={{textAlign:'left'}}>🏆 WIN</div>}
+                  <div className="team-name" style={{color:w2?'var(--t1)':w1?'var(--t3)':'var(--t2)'}}>{m.t2n}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 4. RANKINGS
+// ═══════════════════════════════════════════════════════════════════
+function Ranks({activeGroups,matches}) {
+  const [selGid, setSelGid] = useState(activeGroups[0]?.id||null);
+  useEffect(()=>{if(!selGid&&activeGroups.length>0) setSelGid(activeGroups[0].id);},[activeGroups]);
+  const [showAll, setShowAll] = useState(false);
+
+  if(activeGroups.length===0) return(
+    <div className="card" style={{padding:32,textAlign:'center',color:'var(--t3)'}}>
+      팀 등록 후 경기 결과를 입력하면 순위가 자동 계산됩니다
+    </div>
+  );
+
+  const group = activeGroups.find(g=>g.id===selGid);
+  const rank  = group ? calcRank(group,matches) : [];
+
+  return (
+    <div className="flex col gap-14">
+      {/* header */}
+      <div className="card-gold" style={{padding:'20px 22px'}}>
+        <div className="flex gap-10 center" style={{marginBottom:6}}>
+          <SVG d={I.trophy} s={22} c="var(--gold)"/>
+          <div style={{fontSize:20,fontWeight:800,
+            background:'linear-gradient(90deg,var(--gold-l),var(--gold),var(--gold-d))',
+            backgroundSize:'200% auto',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+            animation:'shimmer 3s linear infinite'}}>
+            최종 조별 순위
+          </div>
+        </div>
+        <div style={{fontSize:12,color:'var(--t3)'}}>
+          순위 기준: <span style={{color:'var(--gold)'}}>득실차</span> → <span style={{color:'var(--blue)'}}>승자승</span> → <span style={{color:'var(--purple)'}}>연장자(합산나이)</span>
+        </div>
+      </div>
+
+      {/* group tabs */}
+      <div className="group-tabs">
+        {activeGroups.map(g=>(
+          <button key={g.id} className={`gtab${selGid===g.id?' on':''}`} onClick={()=>setSelGid(g.id)}>
+            {g.name}
+          </button>
+        ))}
+      </div>
+
+      {/* podium — top 3 */}
+      {rank.length>=2 && (
+        <div className="podium">
+          {/* 2nd */}
+          <div className="podium-card podium-2">
+            <Medal n={1}/>
+            <div className="podium-name" style={{color:'var(--t2)'}}>{rank[1]?.name}</div>
+            <div className="podium-stat" style={{color:'#94A3B8'}}>{rank[1]?.wins}승 {rank[1]?.losses}패</div>
+            <div className="podium-stat" style={{color:'#94A3B8'}}>{rank[1]?.diff>0?'+':''}{rank[1]?.diff}</div>
+            <div className="podium-bar" style={{height:48,background:'rgba(148,163,184,0.15)',marginTop:6}}/>
+          </div>
+          {/* 1st */}
+          <div className="podium-card podium-1">
+            <span style={{fontSize:20}}>👑</span>
+            <Medal n={0}/>
+            <div className="podium-name" style={{color:'var(--gold)',fontWeight:800}}>{rank[0]?.name}</div>
+            <div className="podium-stat" style={{color:'var(--gold)'}}>{rank[0]?.wins}승 {rank[0]?.losses}패</div>
+            <div className="podium-stat" style={{color:'var(--gold)'}}>{rank[0]?.diff>0?'+':''}{rank[0]?.diff}</div>
+            <div className="podium-bar" style={{height:68,background:'rgba(212,175,55,0.2)',marginTop:6}}/>
+          </div>
+          {/* 3rd */}
+          {rank.length>=3 && (
+            <div className="podium-card podium-3">
+              <Medal n={2}/>
+              <div className="podium-name" style={{color:'#F97316'}}>{rank[2]?.name}</div>
+              <div className="podium-stat" style={{color:'#F97316'}}>{rank[2]?.wins}승 {rank[2]?.losses}패</div>
+              <div className="podium-stat" style={{color:'#F97316'}}>{rank[2]?.diff>0?'+':''}{rank[2]?.diff}</div>
+              <div className="podium-bar" style={{height:36,background:'rgba(180,83,9,0.15)',marginTop:6}}/>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* full table */}
+      <div className="card" style={{overflow:'hidden'}}>
+        {/* header */}
+        <div className="rank-row" style={{borderBottom:'1px solid var(--border)',opacity:.6}}>
+          <div/>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--t3)'}}>팀명</div>
+          <div className="rank-val" style={{fontSize:10,fontWeight:700,letterSpacing:'0.06em',color:'var(--blue)'}}>승</div>
+          <div className="rank-val hide-sm" style={{fontSize:10,fontWeight:700,letterSpacing:'0.06em',color:'var(--red)'}}>패</div>
+          <div className="rank-val hide-sm" style={{fontSize:10,fontWeight:700,letterSpacing:'0.06em',color:'var(--t3)'}}>득점</div>
+          <div className="rank-val hide-sm" style={{fontSize:10,fontWeight:700,letterSpacing:'0.06em',color:'var(--t3)'}}>실점</div>
+          <div className="rank-val" style={{fontSize:10,fontWeight:700,letterSpacing:'0.06em',color:'var(--green)'}}>득실</div>
+        </div>
+
+        {rank.length===0
+          ? <div style={{padding:28,textAlign:'center',color:'var(--t3)',fontSize:13}}>경기 결과를 입력하면 자동으로 순위가 계산됩니다</div>
+          : rank.map((t,i)=>(
+            <div key={t.id} className={`rank-row${i===0?' top':''}`}>
+              <div style={{display:'flex',justifyContent:'center'}}><Medal n={i}/></div>
+              <div style={{fontSize:13,fontWeight:700,color:i===0?'var(--t1)':'var(--t2)'}}>{t.name}</div>
+              <div className="rank-val rank-win">{t.wins}</div>
+              <div className="rank-val rank-lose hide-sm">{t.losses}</div>
+              <div className="rank-val" style={{color:'var(--t2)'}}>{t.pf}</div>
+              <div className="rank-val hide-sm" style={{color:'var(--t3)'}}>{t.pa}</div>
+              <div className={`rank-val rank-diff${t.diff>0?' pos':t.diff<0?' neg':''}`}>
+                {t.diff>0?'+':''}{t.diff}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      {/* all groups summary */}
+      <div>
+        <div className="flex between center" style={{marginBottom:10}}>
+          <div className="sec" style={{marginBottom:0}}>전체 조 순위 요약</div>
+          <button className="btn btn-ghost btn-sm" onClick={()=>setShowAll(v=>!v)}>
+            {showAll?'접기':'모두 보기'}
+          </button>
+        </div>
+        {showAll && activeGroups.map(g=>{
+          const r = calcRank(g,matches);
+          const top3 = r.slice(0,3);
+          return(
+            <div key={g.id} className="card" style={{padding:'14px 16px',marginBottom:8}}>
+              <div style={{fontWeight:700,fontSize:13,marginBottom:10,color:'var(--gold)'}}>{g.name}</div>
+              <div className="flex col gap-6">
+                {top3.length===0
+                  ? <div style={{fontSize:12,color:'var(--t3)'}}>결과 없음</div>
+                  : top3.map((t,i)=>(
+                    <div key={t.id} className="flex gap-10 center">
+                      <Medal n={i}/>
+                      <span style={{fontSize:13,fontWeight:600,flex:1}}>{t.name}</span>
+                      <span style={{fontSize:12,color:'var(--t3)'}}>{t.wins}승 {t.losses}패</span>
+                      <span style={{fontSize:12,fontWeight:700,color:t.diff>0?'var(--green)':t.diff<0?'var(--red)':'var(--t3)'}}>
+                        {t.diff>0?'+':''}{t.diff}
+                      </span>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
